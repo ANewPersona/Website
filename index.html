@@ -1,0 +1,558 @@
+--- Index.html (原始)
+<!DOCTYPE html>
+
+<html>
+
+    <style>
+    body{
+        display: absolute;
+        margin: 6000;
+        background-repeat: no-repeat;
+        background-size: 1000vh 80000vh;
+        background-image: linear-gradient(to bottom, rgb(4,4,4), rgb(230,40,30));
+        color: white;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    </style>
+
+<head>
+    <title>My Wedbiste</title>
+
+
+</head>
+
+<body >
+    <pre>
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+        FAIRS but, how will you even take care of me lorem ipsum
+    </pre>
+    hello, i am your own person
+
+</body>
+</html>
+
++++ Index.html (修改后)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Adorable Collage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ffecd2 100%);
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Toolbar Styles */
+        .toolbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.4);
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90%;
+        }
+
+        .toolbar-btn {
+            background: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff6b9d;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .toolbar-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .toolbar-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Collage Canvas */
+        .collage-canvas {
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 100px;
+            position: relative;
+        }
+
+        /* Widget Styles */
+        .widget {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .widget:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .widget.selected {
+            outline: 3px dashed #ff6b9d;
+            outline-offset: 3px;
+        }
+
+        /* Text Widget */
+        .text-widget {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            min-width: 150px;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .text-widget[contenteditable="true"] {
+            outline: 2px solid #ffb6c1;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { outline-color: #ffb6c1; }
+            50% { outline-color: #ff6b9d; }
+        }
+
+        /* Image Widget */
+        .image-widget {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background: white;
+        }
+
+        .image-widget img {
+            display: block;
+            max-width: 300px;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        /* Sticker Widget */
+        .sticker-widget {
+            font-size: 60px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        /* Shape Widgets */
+        .shape-widget {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .shape-heart {
+            width: 80px;
+            height: 80px;
+            background: #ff6b9d;
+            transform: rotate(45deg);
+            position: relative;
+        }
+
+        .shape-heart:before,
+        .shape-heart:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #ff6b9d;
+            border-radius: 50%;
+        }
+
+        .shape-heart:before {
+            left: -40px;
+        }
+
+        .shape-heart:after {
+            top: -40px;
+        }
+
+        .shape-star {
+            width: 80px;
+            height: 80px;
+            background: #ffd93d;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .shape-cloud {
+            width: 120px;
+            height: 60px;
+            background: white;
+            border-radius: 50px;
+            position: relative;
+        }
+
+        .shape-cloud:before,
+        .shape-cloud:after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .shape-cloud:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 20px;
+        }
+
+        .shape-cloud:after {
+            width: 70px;
+            height: 70px;
+            top: -35px;
+            right: 20px;
+        }
+
+        /* Delete Button */
+        .delete-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 25px;
+            height: 25px;
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .widget:hover .delete-btn {
+            display: flex;
+        }
+
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 12px;
+            color: #666;
+            max-width: 250px;
+        }
+
+        .instructions h4 {
+            color: #ff6b9d;
+            margin-bottom: 8px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .instructions li:before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <button class="toolbar-btn" onclick="addTextWidget()">📝 Add Text</button>
+        <button class="toolbar-btn" onclick="addImageWidget()">🖼️ Add Image</button>
+        <button class="toolbar-btn" onclick="addStickerWidget()">🌟 Add Sticker</button>
+        <button class="toolbar-btn" onclick="addShapeWidget('heart')">❤️ Heart</button>
+        <button class="toolbar-btn" onclick="addShapeWidget('star')">⭐ Star</button>
+        <button class="toolbar-btn" onclick="addShapeWidget('cloud')">☁️ Cloud</button>
+    </div>
+
+    <!-- Collage Canvas -->
+    <div class="collage-canvas" id="canvas"></div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+        <h4>How to Use:</h4>
+        <ul>
+            <li>Click buttons to add widgets</li>
+            <li>Drag widgets to move them</li>
+            <li>Click text to edit it</li>
+            <li>Hover & click ✕ to delete</li>
+            <li>Have fun creating! 🎨</li>
+        </ul>
+    </div>
+
+    <script>
+        let widgetId = 0;
+        let selectedWidget = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let currentWidget = null;
+
+        // Add Text Widget
+        function addTextWidget() {
+            const canvas = document.getElementById('canvas');
+            const widget = document.createElement('div');
+            widget.className = 'widget text-widget';
+            widget.id = 'widget-' + widgetId++;
+            widget.style.left = (Math.random() * 400 + 50) + 'px';
+            widget.style.top = (Math.random() * 400 + 150) + 'px';
+            widget.innerHTML = '<div class="delete-btn" onclick="deleteWidget(\'' + widget.id + '\')">×</div><div contenteditable="true">Click to edit text!</div>';
+            canvas.appendChild(widget);
+
+            // Make text editable on click
+            const textDiv = widget.querySelector('[contenteditable]');
+            textDiv.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.focus();
+            });
+
+            setupWidgetDrag(widget);
+        }
+
+        // Add Image Widget
+        function addImageWidget() {
+            const canvas = document.getElementById('canvas');
+            const widget = document.createElement('div');
+            widget.className = 'widget image-widget';
+            widget.id = 'widget-' + widgetId++;
+            widget.style.left = (Math.random() * 400 + 50) + 'px';
+            widget.style.top = (Math.random() * 400 + 150) + 'px';
+
+            // Create file input for image selection
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        widget.innerHTML = '<div class="delete-btn" onclick="deleteWidget(\'' + widget.id + '\')">×</div><img src="' + event.target.result + '" alt="User image">';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            widget.innerHTML = '<div class="delete-btn" onclick="deleteWidget(\'' + widget.id + '\')">×</div><div style="padding: 40px 20px; text-align: center; color: #999; cursor: pointer;" onclick="this.parentElement.querySelector(\'input[type=file]\').click()">Click to add image</div>';
+            widget.appendChild(input);
+            canvas.appendChild(widget);
+
+            setupWidgetDrag(widget);
+        }
+
+        // Add Sticker Widget
+        function addStickerWidget() {
+            const canvas = document.getElementById('canvas');
+            const widget = document.createElement('div');
+            widget.className = 'widget sticker-widget';
+            widget.id = 'widget-' + widgetId++;
+            widget.style.left = (Math.random() * 400 + 50) + 'px';
+            widget.style.top = (Math.random() * 400 + 150) + 'px';
+
+            const stickers = ['🌸', '🦋', '🌈', '✨', '🎀', '🍓', '🌻', '💫', '🎵', '🍭'];
+            const randomSticker = stickers[Math.floor(Math.random() * stickers.length)];
+
+            widget.innerHTML = '<div class="delete-btn" onclick="deleteWidget(\'' + widget.id + '\')">×</div>' + randomSticker;
+            canvas.appendChild(widget);
+
+            setupWidgetDrag(widget);
+        }
+
+        // Add Shape Widget
+        function addShapeWidget(shapeType) {
+            const canvas = document.getElementById('canvas');
+            const widget = document.createElement('div');
+            widget.className = 'widget shape-widget shape-' + shapeType;
+            widget.id = 'widget-' + widgetId++;
+            widget.style.left = (Math.random() * 400 + 50) + 'px';
+            widget.style.top = (Math.random() * 400 + 150) + 'px';
+            widget.innerHTML = '<div class="delete-btn" onclick="deleteWidget(\'' + widget.id + '\')">×</div>';
+            canvas.appendChild(widget);
+
+            setupWidgetDrag(widget);
+        }
+
+        // Delete Widget
+        function deleteWidget(widgetId) {
+            const widget = document.getElementById(widgetId);
+            if (widget) {
+                widget.remove();
+            }
+        }
+
+        // Setup Drag Functionality
+        function setupWidgetDrag(widget) {
+            widget.addEventListener('mousedown', function(e) {
+                if (e.target.classList.contains('delete-btn') || e.target.isContentEditable) {
+                    return;
+                }
+
+                isDragging = true;
+                currentWidget = widget;
+
+                const rect = widget.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+
+                widget.classList.add('selected');
+                e.preventDefault();
+            });
+        }
+
+        // Mouse Move Handler
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging && currentWidget) {
+                const canvas = document.getElementById('canvas');
+                const canvasRect = canvas.getBoundingClientRect();
+
+                let newX = e.clientX - canvasRect.left - dragOffset.x;
+                let newY = e.clientY - canvasRect.top - dragOffset.y;
+
+                currentWidget.style.left = newX + 'px';
+                currentWidget.style.top = newY + 'px';
+            }
+        });
+
+        // Mouse Up Handler
+        document.addEventListener('mouseup', function() {
+            if (currentWidget) {
+                currentWidget.classList.remove('selected');
+            }
+            isDragging = false;
+            currentWidget = null;
+        });
+
+        // Touch support for mobile
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                const widget = document.elementFromPoint(touch.clientX, touch.clientY);
+                const widgetEl = widget ? widget.closest('.widget') : null;
+
+                if (widgetEl && !widget.classList.contains('delete-btn')) {
+                    isDragging = true;
+                    currentWidget = widgetEl;
+
+                    const rect = widgetEl.getBoundingClientRect();
+                    dragOffset.x = touch.clientX - rect.left;
+                    dragOffset.y = touch.clientY - rect.top;
+
+                    widgetEl.classList.add('selected');
+                    e.preventDefault();
+                }
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(e) {
+            if (isDragging && currentWidget && e.touches.length === 1) {
+                const touch = e.touches[0];
+                const canvas = document.getElementById('canvas');
+                const canvasRect = canvas.getBoundingClientRect();
+
+                let newX = touch.clientX - canvasRect.left - dragOffset.x;
+                let newY = touch.clientY - canvasRect.top - dragOffset.y;
+
+                currentWidget.style.left = newX + 'px';
+                currentWidget.style.top = newY + 'px';
+
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', function() {
+            if (currentWidget) {
+                currentWidget.classList.remove('selected');
+            }
+            isDragging = false;
+            currentWidget = null;
+        });
+
+        // Click outside to deselect
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.widget')) {
+                document.querySelectorAll('.widget.selected').forEach(function(widget) {
+                    widget.classList.remove('selected');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
