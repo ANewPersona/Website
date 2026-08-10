@@ -1,5 +1,3 @@
-
-+++ Index.html (修改后)
 <!DOCTYPE html>
 <html>
 <head>
@@ -267,6 +265,9 @@
         <button class="toolbar-btn" onclick="addShapeWidget('heart')">❤️ Heart</button>
         <button class="toolbar-btn" onclick="addShapeWidget('star')">⭐ Star</button>
         <button class="toolbar-btn" onclick="addShapeWidget('cloud')">☁️ Cloud</button>
+        <button class="toolbar-btn" onclick="saveLayout()">💾 Save Layout</button>
+        <button class="toolbar-btn" onclick="document.getElementById('loadFileInput').click()">📂 Load Layout</button>
+        <input type="file" id="loadFileInput" accept=".json" style="display:none" onchange="loadLayoutFromFile(event)">
     </div>
 
     <!-- Collage Canvas -->
@@ -280,6 +281,8 @@
             <li>Drag widgets to move them</li>
             <li>Click text to edit it</li>
             <li>Hover & click ✕ to delete</li>
+            <li>Click "Save Layout" to download your collage</li>
+            <li>Click "Load Layout" to restore a saved collage</li>
             <li>Have fun creating! 🎨</li>
         </ul>
     </div>
@@ -479,6 +482,175 @@
                 });
             }
         });
+
+        // Save Layout - exports layout as JSON with embedded image data
+        function saveLayout() {
+            const canvas = document.getElementById('canvas');
+            const widgets = canvas.querySelectorAll('.widget');
+            const layoutData = {
+                widgets: []
+            };
+
+            widgets.forEach(function(widget) {
+                const widgetData = {
+                    id: widget.id,
+                    type: getWidgetType(widget),
+                    left: widget.style.left,
+                    top: widget.style.top,
+                    content: null
+                };
+
+                // Get widget content based on type
+                if (widgetData.type === 'text') {
+                    const textDiv = widget.querySelector('[contenteditable]');
+                    widgetData.content = textDiv ? textDiv.innerHTML : '';
+                } else if (widgetData.type === 'image') {
+                    const img = widget.querySelector('img');
+                    if (img && img.src) {
+                        widgetData.content = img.src; // This includes base64 data URL
+                    }
+                } else if (widgetData.type === 'sticker') {
+                    // Get the sticker emoji (text content excluding delete button)
+                    const contents = widget.childNodes;
+                    for (let i = 0; i < contents.length; i++) {
+                        if (contents[i].nodeType === 3 && contents[i].textContent.trim()) {
+                            widgetData.content = contents[i].textContent.trim();
+                            break;
+                        }
+                    }
+                } else if (widgetData.type === 'shape') {
+                    // Determine shape type from classes
+                    if (widget.classList.contains('shape-heart')) {
+                        widgetData.shapeType = 'heart';
+                    } else if (widget.classList.contains('shape-star')) {
+                        widgetData.shapeType = 'star';
+                    } else if (widget.classList.contains('shape-cloud')) {
+                        widgetData.shapeType = 'cloud';
+                    }
+                }
+
+                layoutData.widgets.push(widgetData);
+            });
+
+            // Create and download JSON file
+            const jsonString = JSON.stringify(layoutData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'collage-layout.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Load Layout from file
+        function loadLayoutFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const layoutData = JSON.parse(e.target.result);
+                    restoreLayout(layoutData);
+                } catch (error) {
+                    alert('Error loading layout file. Please make sure it\'s a valid JSON file.');
+                    console.error('Load error:', error);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset input so same file can be loaded again
+            event.target.value = '';
+        }
+
+        // Restore layout from data
+        function restoreLayout(layoutData) {
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = ''; // Clear existing widgets
+            
+            // Reset widget counter
+            widgetId = 0;
+
+            if (!layoutData || !layoutData.widgets) {
+                alert('Invalid layout data.');
+                return;
+            }
+
+            layoutData.widgets.forEach(function(widgetData) {
+                const widget = document.createElement('div');
+                widget.className = 'widget ' + getWidgetClass(widgetData.type);
+                widget.id = 'widget-' + (widgetId++);
+                widget.style.left = widgetData.left;
+                widget.style.top = widgetData.top;
+
+                // Create delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = function() { deleteWidget(widget.id); };
+                deleteBtn.innerHTML = '×';
+                widget.appendChild(deleteBtn);
+
+                // Restore content based on type
+                if (widgetData.type === 'text') {
+                    const textDiv = document.createElement('div');
+                    textDiv.setAttribute('contenteditable', 'true');
+                    textDiv.innerHTML = widgetData.content || 'Click to edit text!';
+                    widget.appendChild(textDiv);
+                    
+                    textDiv.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        this.focus();
+                    });
+                    
+                    setupWidgetDrag(widget);
+                } else if (widgetData.type === 'image') {
+                    if (widgetData.content) {
+                        const img = document.createElement('img');
+                        img.src = widgetData.content;
+                        img.alt = 'User image';
+                        widget.appendChild(img);
+                        setupWidgetDrag(widget);
+                    } else {
+                        // No image data, create placeholder
+                        const placeholder = document.createElement('div');
+                        placeholder.style.cssText = 'padding: 40px 20px; text-align: center; color: #999; cursor: pointer;';
+                        placeholder.innerHTML = 'Image data not found';
+                        widget.appendChild(placeholder);
+                    }
+                } else if (widgetData.type === 'sticker') {
+                    widget.appendChild(document.createTextNode(widgetData.content || '🌟'));
+                    setupWidgetDrag(widget);
+                } else if (widgetData.type === 'shape') {
+                    widget.classList.add('shape-' + (widgetData.shapeType || 'heart'));
+                    setupWidgetDrag(widget);
+                }
+
+                canvas.appendChild(widget);
+            });
+        }
+
+        // Helper: Get widget type from element
+        function getWidgetType(widget) {
+            if (widget.classList.contains('text-widget')) return 'text';
+            if (widget.classList.contains('image-widget')) return 'image';
+            if (widget.classList.contains('sticker-widget')) return 'sticker';
+            if (widget.classList.contains('shape-widget')) return 'shape';
+            return 'unknown';
+        }
+
+        // Helper: Get widget class from type
+        function getWidgetClass(type) {
+            switch(type) {
+                case 'text': return 'text-widget';
+                case 'image': return 'image-widget';
+                case 'sticker': return 'sticker-widget';
+                case 'shape': return 'shape-widget';
+                default: return '';
+            }
+        }
     </script>
 </body>
 </html>
