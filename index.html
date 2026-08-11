@@ -292,6 +292,24 @@
             padding: 5px;
         }
 
+        .custom-file-upload {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 154, 158, 0.3);
+        }
+
+        .custom-file-upload:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 154, 158, 0.5);
+        }
+
         .youtube-search-container {
             display: flex;
             gap: 8px;
@@ -500,7 +518,13 @@
                     <button class="search-btn" onclick="searchYouTube('${widget.id}')">🔍</button>
                 </div>
                 <div class="song-result" id="result-${widget.id}">
-                    <div class="music-info">Search for a song to add</div>
+                    <div class="music-info">Search for a song or upload your own!</div>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <label class="custom-file-upload">
+                        <input type="file" accept="audio/*" style="display: none;" onchange="loadCustomSongFromWidget(this)">
+                        📁 Upload Custom Song
+                    </label>
                 </div>
             `;
             
@@ -560,6 +584,13 @@
                             Your browser does not support the audio element.
                         </audio>
                         <div class="music-info">${escapeHtml(foundVideo.author || 'Unknown Artist')} • ${formatDuration(foundVideo.duration)}</div>
+                        <div style="margin-top: 8px; text-align: center;">
+                            <p style="font-size: 11px; color: #888; margin-bottom: 4px;">- OR -</p>
+                            <label class="custom-file-upload" style="font-size: 11px; padding: 4px 8px;">
+                                <input type="file" accept="audio/*" style="display: none;" onchange="loadCustomSongFromWidget(this)">
+                                📁 Upload Custom Song
+                            </label>
+                        </div>
                     `;
                 } else {
                     resultDiv.innerHTML = '<div class="music-info" style="color: #ff6b6b;">Search failed. All services unavailable or no videos found.</div>';
@@ -583,6 +614,38 @@
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+
+        // Load custom song from file input (widget version)
+        function loadCustomSongFromWidget(input) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                const widget = input.closest('.music-widget');
+                if (!widget) return;
+                
+                const resultDiv = widget.querySelector('.song-results') || widget.querySelector('.current-song');
+                const audioUrl = URL.createObjectURL(file);
+                
+                if (resultDiv) {
+                    resultDiv.innerHTML = `
+                        <div class="song-title">${escapeHtml(file.name)}</div>
+                        <audio controls style="width: 100%;">
+                            <source src="${audioUrl}" type="${file.type}">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="music-info">Custom Upload • ${formatDuration(0)}</div>
+                        <div style="margin-top: 8px; text-align: center;">
+                            <p style="font-size: 11px; color: #888; margin-bottom: 4px;">- OR -</p>
+                            <label class="custom-file-upload" style="font-size: 11px; padding: 4px 8px;">
+                                <input type="file" accept="audio/*" style="display: none;" onchange="loadCustomSongFromWidget(this)">
+                                📁 Upload Different Song
+                            </label>
+                        </div>
+                    `;
+                }
+            } else {
+                alert('Please select a valid audio file (MP3, WAV, OGG, etc.)');
+            }
         }
 
         // Delete Widget
