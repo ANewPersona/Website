@@ -573,8 +573,12 @@
             }
         }
 
-        // Setup Drag Functionality
+        // Setup Drag Functionality - Long press to drag
         function setupWidgetDrag(widget) {
+            let dragTimer = null;
+            let isWidgetDragging = false;
+            const dragDelay = 200; // ms to hold before dragging starts
+
             widget.addEventListener('mousedown', function(e) {
                 if (e.target.classList.contains('delete-btn') || 
                     e.target.isContentEditable || 
@@ -584,15 +588,39 @@
                     return;
                 }
 
-                isDragging = true;
-                currentWidget = widget;
+                // Start timer for long-press drag
+                dragTimer = setTimeout(() => {
+                    isWidgetDragging = true;
+                    currentWidget = widget;
 
-                const rect = widget.getBoundingClientRect();
-                dragOffset.x = e.clientX - rect.left;
-                dragOffset.y = e.clientY - rect.top;
+                    const rect = widget.getBoundingClientRect();
+                    dragOffset.x = e.clientX - rect.left;
+                    dragOffset.y = e.clientY - rect.top;
 
-                widget.classList.add('selected');
-                e.preventDefault();
+                    widget.classList.add('selected');
+                    e.preventDefault();
+                }, dragDelay);
+            });
+
+            widget.addEventListener('mouseup', function() {
+                if (dragTimer) {
+                    clearTimeout(dragTimer);
+                    dragTimer = null;
+                }
+                if (isWidgetDragging) {
+                    isWidgetDragging = false;
+                    if (currentWidget) {
+                        currentWidget.classList.remove('selected');
+                    }
+                    currentWidget = null;
+                }
+            });
+
+            widget.addEventListener('mouseleave', function() {
+                if (dragTimer) {
+                    clearTimeout(dragTimer);
+                    dragTimer = null;
+                }
             });
             
             // Prevent drag on touch devices when interacting with inputs
@@ -602,7 +630,35 @@
                     e.target.closest('.youtube-search-container')) {
                     return;
                 }
+                
+                // Start timer for long-press drag on touch
+                dragTimer = setTimeout(() => {
+                    isWidgetDragging = true;
+                    currentWidget = widget;
+
+                    const rect = widget.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    dragOffset.x = touch.clientX - rect.left;
+                    dragOffset.y = touch.clientY - rect.top;
+
+                    widget.classList.add('selected');
+                    e.preventDefault();
+                }, dragDelay);
             }, { passive: true });
+
+            widget.addEventListener('touchend', function() {
+                if (dragTimer) {
+                    clearTimeout(dragTimer);
+                    dragTimer = null;
+                }
+                if (isWidgetDragging) {
+                    isWidgetDragging = false;
+                    if (currentWidget) {
+                        currentWidget.classList.remove('selected');
+                    }
+                    currentWidget = null;
+                }
+            });
         }
 
         // Mouse Move Handler
@@ -628,23 +684,21 @@
             currentWidget = null;
         });
 
-        // Touch support for mobile
+        // Touch support for mobile - global handlers for actual dragging
         document.addEventListener('touchstart', function(e) {
+            // Only handle if not already handled by widget-specific listener
+            if (e.target.closest('.widget')) {
+                return;
+            }
+            
             if (e.touches.length === 1) {
                 const touch = e.touches[0];
                 const widget = document.elementFromPoint(touch.clientX, touch.clientY);
                 const widgetEl = widget ? widget.closest('.widget') : null;
 
                 if (widgetEl && !widget.classList.contains('delete-btn')) {
-                    isDragging = true;
-                    currentWidget = widgetEl;
-
-                    const rect = widgetEl.getBoundingClientRect();
-                    dragOffset.x = touch.clientX - rect.left;
-                    dragOffset.y = touch.clientY - rect.top;
-
-                    widgetEl.classList.add('selected');
-                    e.preventDefault();
+                    // Check if this should trigger drag (long press handled in widget listener)
+                    // This is just a fallback
                 }
             }
         }, { passive: false });
