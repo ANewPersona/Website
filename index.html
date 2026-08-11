@@ -521,33 +521,53 @@
 
             resultDiv.innerHTML = '<div class="music-info">Searching...</div>';
 
-            // Use Invidious API for YouTube search (no API key needed)
-            fetch('https://inv.nadeko.net/api/v1/search?q=' + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
+            // Use CORS proxy to access Invidious API (bypasses CORS restrictions)
+            const corsProxy = 'https://api.allorigins.win/raw?url=';
+            const instances = [
+                'https://inv.nadeko.net',
+                'https://invidious.io.lol',
+                'https://yewtu.be',
+                'https://invidious.fdn.fr'
+            ];
+            
+            let foundVideo = null;
+            
+            // Try multiple instances until one works
+            Promise.all(instances.map(instance => 
+                fetch(corsProxy + encodeURIComponent(instance + '/api/v1/search?q=' + encodeURIComponent(query)))
+                    .then(response => response.ok ? response.json() : Promise.reject())
+                    .catch(() => null)
+            )).then(results => {
+                // Find first valid result with a video
+                for (const data of results) {
                     if (data && data.length > 0) {
-                        // Find first video result
                         const video = data.find(item => item.type === 'video');
                         if (video) {
-                            resultDiv.innerHTML = `
-                                <div class="song-title">${escapeHtml(video.title)}</div>
-                                <audio controls style="width: 100%;">
-                                    <source src="https://inv.nadeko.net/watch?v=${video.videoId}" type="audio/mp4">
-                                    Your browser does not support the audio element.
-                                </audio>
-                                <div class="music-info">${escapeHtml(video.author)} • ${formatDuration(video.duration)}</div>
-                            `;
-                        } else {
-                            resultDiv.innerHTML = '<div class="music-info">No videos found. Try a different search.</div>';
+                            foundVideo = video;
+                            break;
                         }
-                    } else {
-                        resultDiv.innerHTML = '<div class="music-info">No results found. Try a different search.</div>';
                     }
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    resultDiv.innerHTML = '<div class="music-info">Search failed. Please try again.</div>';
-                });
+                }
+                
+                if (foundVideo) {
+                    // Get the audio stream URL from a working instance
+                    const audioUrl = 'https://inv.nadeko.net/watch?v=' + foundVideo.videoId;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="song-title">${escapeHtml(foundVideo.title)}</div>
+                        <audio controls style="width: 100%;">
+                            <source src="${audioUrl}" type="audio/mp4">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="music-info">${escapeHtml(foundVideo.author || 'Unknown Artist')} • ${formatDuration(foundVideo.duration)}</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="music-info" style="color: #ff6b6b;">Search failed. All services unavailable or no videos found.</div>';
+                }
+            }).catch(error => {
+                console.error('Search error:', error);
+                resultDiv.innerHTML = '<div class="music-info" style="color: #ff6b6b;">Search failed. Please try again.</div>';
+            });
         }
 
         // Helper function to escape HTML
