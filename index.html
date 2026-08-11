@@ -611,6 +611,7 @@
                 // Start timer for long-press drag
                 dragTimer = setTimeout(() => {
                     isWidgetDragging = true;
+                    isDragging = true;
                     currentWidget = widget;
 
                     const rect = widget.getBoundingClientRect();
@@ -629,6 +630,7 @@
                 }
                 if (isWidgetDragging) {
                     isWidgetDragging = false;
+                    isDragging = false;
                     if (currentWidget) {
                         currentWidget.classList.remove('selected');
                     }
@@ -654,6 +656,7 @@
                 // Start timer for long-press drag on touch
                 dragTimer = setTimeout(() => {
                     isWidgetDragging = true;
+                    isDragging = true;
                     currentWidget = widget;
 
                     const rect = widget.getBoundingClientRect();
@@ -673,6 +676,7 @@
                 }
                 if (isWidgetDragging) {
                     isWidgetDragging = false;
+                    isDragging = false;
                     if (currentWidget) {
                         currentWidget.classList.remove('selected');
                     }
