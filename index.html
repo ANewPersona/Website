@@ -253,6 +253,77 @@
             position: absolute;
             left: 0;
         }
+
+        /* Music Widget */
+        .music-widget {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px 20px;
+            border-radius: 15px;
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .music-widget audio {
+            width: 100%;
+            height: 40px;
+        }
+
+        .music-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .youtube-search-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .youtube-search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #ffb6c1;
+            border-radius: 20px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .youtube-search-input:focus {
+            border-color: #ff6b9d;
+        }
+
+        .search-btn {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .search-btn:hover {
+            background: #ff4785;
+        }
+
+        .song-result {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        .song-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ff6b9d;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 
@@ -265,7 +336,9 @@
         <button class="toolbar-btn" onclick="addShapeWidget('heart')">❤️ Heart</button>
         <button class="toolbar-btn" onclick="addShapeWidget('star')">⭐ Star</button>
         <button class="toolbar-btn" onclick="addShapeWidget('cloud')">☁️ Cloud</button>
-        <button class="toolbar-btn" onclick="saveLayout()">💾 Save Layout</button>
+        <button class="toolbar-btn" onclick="addMusicWidget()">🎵 Add Song</button>
+        <button class="toolbar-btn" onclick="saveLayout()">💾 Save Layout (JSON)</button>
+        <button class="toolbar-btn" onclick="saveCollageAsHTML()">📥 Save Collage (HTML)</button>
         <button class="toolbar-btn" onclick="document.getElementById('loadFileInput').click()">📂 Load Layout</button>
         <input type="file" id="loadFileInput" accept=".json" style="display:none" onchange="loadLayoutFromFile(event)">
     </div>
@@ -281,8 +354,10 @@
             <li>Drag widgets to move them</li>
             <li>Click text to edit it</li>
             <li>Hover & click ✕ to delete</li>
-            <li>Click "Save Layout" to download your collage</li>
-            <li>Click "Load Layout" to restore a saved collage</li>
+            <li>🎵 Add songs via YouTube search</li>
+            <li>💾 Save Layout (JSON) - saves positions & data</li>
+            <li>📥 Save Collage (HTML) - saves everything including images!</li>
+            <li>📂 Load Layout - restore a saved JSON layout</li>
             <li>Have fun creating! 🎨</li>
         </ul>
     </div>
@@ -377,6 +452,87 @@
             canvas.appendChild(widget);
 
             setupWidgetDrag(widget);
+        }
+
+        // Add Music Widget with YouTube search
+        function addMusicWidget() {
+            const canvas = document.getElementById('canvas');
+            const widget = document.createElement('div');
+            widget.className = 'widget music-widget';
+            widget.id = 'widget-' + widgetId++;
+            widget.style.left = (Math.random() * 400 + 50) + 'px';
+            widget.style.top = (Math.random() * 400 + 150) + 'px';
+
+            widget.innerHTML = `
+                <div class="delete-btn" onclick="deleteWidget('${widget.id}')">×</div>
+                <div class="youtube-search-container">
+                    <input type="text" class="youtube-search-input" placeholder="Search YouTube..." id="search-${widget.id}">
+                    <button class="search-btn" onclick="searchYouTube('${widget.id}')">🔍</button>
+                </div>
+                <div class="song-result" id="result-${widget.id}">
+                    <div class="music-info">Search for a song to add</div>
+                </div>
+            `;
+            
+            canvas.appendChild(widget);
+            setupWidgetDrag(widget);
+        }
+
+        // Search YouTube using Invidious API (privacy-friendly YouTube frontend)
+        function searchYouTube(widgetId) {
+            const searchInput = document.getElementById('search-' + widgetId);
+            const resultDiv = document.getElementById('result-' + widgetId);
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                resultDiv.innerHTML = '<div class="music-info">Please enter a search term</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="music-info">Searching...</div>';
+
+            // Use Invidious API for YouTube search (no API key needed)
+            fetch('https://inv.nadeko.net/api/v1/search?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        // Find first video result
+                        const video = data.find(item => item.type === 'video');
+                        if (video) {
+                            resultDiv.innerHTML = `
+                                <div class="song-title">${escapeHtml(video.title)}</div>
+                                <audio controls style="width: 100%;">
+                                    <source src="https://inv.nadeko.net/watch?v=${video.videoId}" type="audio/mp4">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <div class="music-info">${escapeHtml(video.author)} • ${formatDuration(video.duration)}</div>
+                            `;
+                        } else {
+                            resultDiv.innerHTML = '<div class="music-info">No videos found. Try a different search.</div>';
+                        }
+                    } else {
+                        resultDiv.innerHTML = '<div class="music-info">No results found. Try a different search.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    resultDiv.innerHTML = '<div class="music-info">Search failed. Please try again.</div>';
+                });
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Helper function to format duration
+        function formatDuration(seconds) {
+            if (!seconds) return '';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
         }
 
         // Delete Widget
@@ -527,6 +683,14 @@
                     } else if (widget.classList.contains('shape-cloud')) {
                         widgetData.shapeType = 'cloud';
                     }
+                } else if (widgetData.type === 'music') {
+                    // Save music widget data
+                    const audioEl = widget.querySelector('audio');
+                    const songTitleEl = widget.querySelector('.song-title');
+                    if (audioEl && audioEl.querySelector('source')) {
+                        widgetData.audioSrc = audioEl.querySelector('source').src;
+                        widgetData.songTitle = songTitleEl ? songTitleEl.textContent : '';
+                    }
                 }
 
                 layoutData.widgets.push(widgetData);
@@ -539,6 +703,20 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = 'collage-layout.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Save Collage as complete HTML file with all images embedded
+        function saveCollageAsHTML() {
+            const fullHTML = document.documentElement.outerHTML;
+            const blob = new Blob([fullHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-collage.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -626,6 +804,19 @@
                 } else if (widgetData.type === 'shape') {
                     widget.classList.add('shape-' + (widgetData.shapeType || 'heart'));
                     setupWidgetDrag(widget);
+                } else if (widgetData.type === 'music') {
+                    // Restore music widget
+                    if (widgetData.audioSrc && widgetData.songTitle) {
+                        widget.innerHTML = `<div class="delete-btn" onclick="deleteWidget('${widget.id}')">×</div>
+                            <div class="song-result">
+                                <div class="song-title">${escapeHtml(widgetData.songTitle)}</div>
+                                <audio controls style="width: 100%;">
+                                    <source src="${widgetData.audioSrc}" type="audio/mp4">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>`;
+                        setupWidgetDrag(widget);
+                    }
                 }
 
                 canvas.appendChild(widget);
@@ -638,6 +829,7 @@
             if (widget.classList.contains('image-widget')) return 'image';
             if (widget.classList.contains('sticker-widget')) return 'sticker';
             if (widget.classList.contains('shape-widget')) return 'shape';
+            if (widget.classList.contains('music-widget')) return 'music';
             return 'unknown';
         }
 
@@ -648,6 +840,7 @@
                 case 'image': return 'image-widget';
                 case 'sticker': return 'sticker-widget';
                 case 'shape': return 'shape-widget';
+                case 'music': return 'music-widget';
                 default: return '';
             }
         }
